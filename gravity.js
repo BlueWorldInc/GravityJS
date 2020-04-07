@@ -65,6 +65,8 @@ class Arrow {
         this.x = x;
         this.y = y;
         this.angle = 0;
+        this.scaleX = 2;
+        this.scaleY = 2;
         // this.width;
         // this.height;
     }
@@ -72,9 +74,10 @@ class Arrow {
     drawArrow() {
         ctx.save();
         ctx.beginPath();
-        let p = new Path2D("m 0 -5 l 50 0 v 10 h -50 v -10 z m 50 0 v -5 l 10 10 l -10 10 l 0 -5 z");
+        // let p = new Path2D("m 0 -5 l 50 0 v 10 h -50 v -10 z m 50 0 v -5 l 10 10 l -10 10 l 0 -5 z");
+        let p = new Path2D("m 0 -5 l 50 0 v 10 h -50 a 5 5 0 0 0 0 -10 m 50 0 v -5 l 10 10 l -10 10 l 0 -5 z");
         ctx.translate(this.x, this.y);
-        ctx.scale(2, 2);
+        ctx.scale(this.scaleX, this.scaleY);
         ctx.fillStyle = "gray";
         ctx.rotate(this.angle * Math.PI / 180);
         ctx.fill(p);
@@ -82,8 +85,14 @@ class Arrow {
     }
 
     rotate(angle) {
-        // if (angle > )
-        this.angle = -angle;
+        if (angle % 360 <= 90) { 
+            this.angle = -angle;
+        }
+    }
+
+    scaleArrow(scaleX, scaleY = scaleX) {
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
     }
 
 }
@@ -140,32 +149,35 @@ ball.horizontalSpeed = 0;
 ball.gravity = 0;
 let gen = 0;
 let g = 1;
-// animate();
+let r = 0;
+let s = 20;
+animate();
 
-// ctx.beginPath();
-// let p = new Path2D('M10 10 h 80 v 80 h -80 Z');
-// let p = new Path2D("M 0 0 L 10 5 L 0 10 z");
-// let p = new Path2D("M -50,50 Q -50,-50 50,20");
-// let p = new Path2D("M 50,-50 Q 80,0 40,80");
-// let p = new Path2D("M 50,-50 Q 80,0 40,80");
-// let p = new Path2D("m 0 -5 l 50 0 v 10 h -50 v -10 z m 50 0 v -5 l 10 10 l -10 10 l 0 -5 z");
-// ctx.save();
-// ctx.translate(300, 300);
-// ctx.scale(5, 5);
-// // ctx.rotate(180 * Math.PI / 180);
-// ctx.fill(p);
-// // ctx.stroke(p);
-// ctx.restore();
+let triangle = Math.atan(7/5);
+console.log(radToDeg(triangle));
+
+function radToDeg(rad) {
+    var deg = rad * 180/Math.PI;
+    return deg;
+  }
 
 let arrow = new Arrow(30, HEIGHT-30);
-arrow.rotate(60);
+arrow.rotate(r);
+// arrow.scaleArrow((s / 10), 2);
 arrow.drawArrow();
 
+function angleOnClick(evt) {
+    // console.log(mouseAngle({x: 30, y: HEIGHT-30}, evt));
+    arrow.rotate(mouseAngle({x: 30, y: HEIGHT-30}, evt));
+    // console.log(arrow);
+}
+
 async function animate() {
-    while (gen < 200) {
+    while (gen < 2000) {
         ball.contact = false;
         await sleep(MS);
         clearCanvas();
+        s += 1;
         // y += verticalSpeed;
         // verticalSpeed += g;
         // x += 20;
@@ -188,6 +200,9 @@ async function animate() {
             ball.contactResistance = 0;
         }
         map.ball.moveBallTime();
+        // arrow.rotate(++r);
+        // arrow.scaleArrow((s/10), 2);
+        arrow.drawArrow();
         // map.moveBall(x, y);
         // map.drawBall();
         gen++;
@@ -197,6 +212,24 @@ async function animate() {
 
 function bounce() {
 
+}
+
+// let triangle = Math.atan(7/5);
+// console.log(radToDeg(triangle));
+
+function radToDeg(rad) {
+    var deg = rad * 180/Math.PI;
+    return deg;
+  }
+
+function mouseAngle(base, evt) {
+    let angle = 0;
+    let w = getMousePos(canvas, evt).x - base.x;
+    let h = base.y - getMousePos(canvas, evt).y;
+    // console.log(h);
+    let rad = Math.atan(w/h);
+    angle = 90 - radToDeg(rad);
+    return angle;
 }
 
 function getMousePos(canvas, evt) {
