@@ -5,31 +5,87 @@ const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const FPS = 60;
 const MS = Math.floor(1000 / FPS);
+const START = Date.now();
 canvas.focus();
 
 
 class Ball {
-    
+
     constructor(x, y, radius) {
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.color = "teal";
+        this.verticalSpeed = 0;
+        this.horizontalSpeed = 0;
+        this.creationDate = Date.now();
+        this.elapsedTime = 0;
+        this.gravity = 1;
         this.drawBall();
+        this.contactResistance = 0;
+        this.lastDrawTime = Date.now();
+    }
+
+    addGravity(gravity) {
+        this.gravity = gravity;
     }
 
     moveBall(x, y) {
         this.x = x;
         this.y = y;
     }
-    
+
+    gravityEffect() {
+        this.verticalSpeed += this.gravity;
+        this.verticalSpeed -= this.contactResistance;
+
+    }
+
+    moveBallTime() {
+        this.gravityEffect();
+        this.elapsedTime = (Date.now() - this.lastDrawTime) / 30;
+        this.x += this.horizontalSpeed * this.elapsedTime;
+        this.y += Math.floor(this.verticalSpeed * this.elapsedTime);
+        this.drawBall();
+    }
+
     drawBall() {
         ctx.beginPath();
         ctx.fillStyle = this.color;
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
         ctx.fill();
+        this.lastDrawTime = Date.now();
     }
-    
+
+}
+
+class Arrow {
+
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.angle = 0;
+        // this.width;
+        // this.height;
+    }
+
+    drawArrow() {
+        ctx.save();
+        ctx.beginPath();
+        let p = new Path2D("m 0 -5 l 50 0 v 10 h -50 v -10 z m 50 0 v -5 l 10 10 l -10 10 l 0 -5 z");
+        ctx.translate(this.x, this.y);
+        ctx.scale(2, 2);
+        ctx.fillStyle = "gray";
+        ctx.rotate(this.angle * Math.PI / 180);
+        ctx.fill(p);
+        ctx.restore();
+    }
+
+    rotate(angle) {
+        // if (angle > )
+        this.angle = -angle;
+    }
+
 }
 
 class Map {
@@ -51,7 +107,7 @@ class Map {
     drawBall() {
         this.ball.drawBall();
     }
-    
+
     moveBall(x, y) {
         // console.log(this.width);
         // console.log(this.height);
@@ -69,7 +125,7 @@ class Gravity {
         this.object;
     }
 
-    applyGravity() {}
+    applyGravity() { }
 
 }
 
@@ -79,33 +135,65 @@ map.setBall(ball);
 map.drawBall();
 let x = 150;
 let y = 150;
-let verticalSpeed = 10;
+ball.verticalSpeed = 0;
+ball.horizontalSpeed = 0;
+ball.gravity = 0;
 let gen = 0;
 let g = 1;
-animate();
+// animate();
+
+// ctx.beginPath();
+// let p = new Path2D('M10 10 h 80 v 80 h -80 Z');
+// let p = new Path2D("M 0 0 L 10 5 L 0 10 z");
+// let p = new Path2D("M -50,50 Q -50,-50 50,20");
+// let p = new Path2D("M 50,-50 Q 80,0 40,80");
+// let p = new Path2D("M 50,-50 Q 80,0 40,80");
+// let p = new Path2D("m 0 -5 l 50 0 v 10 h -50 v -10 z m 50 0 v -5 l 10 10 l -10 10 l 0 -5 z");
+// ctx.save();
+// ctx.translate(300, 300);
+// ctx.scale(5, 5);
+// // ctx.rotate(180 * Math.PI / 180);
+// ctx.fill(p);
+// // ctx.stroke(p);
+// ctx.restore();
+
+let arrow = new Arrow(30, HEIGHT-30);
+arrow.rotate(60);
+arrow.drawArrow();
 
 async function animate() {
-    while (gen < 100) {
+    while (gen < 200) {
+        ball.contact = false;
         await sleep(MS);
         clearCanvas();
-        y += verticalSpeed;
-        verticalSpeed += g;
+        // y += verticalSpeed;
+        // verticalSpeed += g;
         // x += 20;
-        if (x > WIDTH) {
-            x = WIDTH;
+        // if (x > WIDTH) {
+        //     x = WIDTH;
+        // }
+        // console.log(ball);
+        if (ball.y + ball.radius >= HEIGHT) {
+            // ball.contact = true;
+            ball.y = HEIGHT - ball.radius;
+            // console.log("contact");
+            console.log(ball.verticalSpeed);
+            if (Math.abs(ball.verticalSpeed) <= 3) {
+                ball.verticalSpeed = 0;
+            } else {
+                ball.verticalSpeed = (-ball.verticalSpeed) / 2;
+            }
+            ball.contactResistance = ball.gravity;
+        } else {
+            ball.contactResistance = 0;
         }
-        console.log(y);
-        if (y + ball.radius > HEIGHT) {
-            y = HEIGHT - ball.radius;
-            console.log("contact");
-            verticalSpeed = (-verticalSpeed) / 2;
-            console.log(verticalSpeed);
-        }
-        map.moveBall(x, y);
-        map.drawBall();
+        map.ball.moveBallTime();
+        // map.moveBall(x, y);
+        // map.drawBall();
         gen++;
     }
 }
+
 
 function bounce() {
 
