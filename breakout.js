@@ -1,7 +1,8 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 var raf;
-var running = false;
+const WIDTH = canvas.width;
+const HEIGHT = canvas.height;
 
 class Rectangle {
 
@@ -47,19 +48,39 @@ class Rectangle {
 class Brick extends Rectangle {
 }
 
-class Racket {
+class Racket extends Rectangle {
+
+    constructor(x = WIDTH/2, y = HEIGHT - 100, w = 90, h = 10, c = "black") {
+        super(x, y, w, h, c);
+    }
+
+    move(x) {
+        this.x = x - (this.width / 2);
+        this.edge();
+    }
+
 }
 
 class Canvas {
 
     constructor() {
         this.brickList = [];
+        this.racket = new Racket();
     }
 
     generateBricks(numberOfBricks) {
         for (let i = 0; i < numberOfBricks; i++) {
             this.brickList.push(new Brick(100 * (i % 10) + 250, 100 + 40 * (Math.floor(i / 10)), 90, 30));
         }
+    }
+
+    drawMap() {
+        this.drawRacket();
+        this.drawBricks();
+    }
+
+    drawRacket() {
+        this.racket.draw();
     }
 
     drawBricks() {
@@ -70,14 +91,12 @@ class Canvas {
 
     checkCollision(ball) {
         for (let i = 0; i < this.brickList.length; i++) {
-            // if (this.brickList[i].isColliding(ball)) {
-                // this.destroyBrick(i);
-            // }
             if (ball.isColliding(this.brickList[i])) {
                 this.destroyBrick(i);
+                break;
             }
         }
-    
+        ball.isColliding(this.racket);
     }
 
     destroyBrick(index) {
@@ -139,11 +158,8 @@ let ind = 0;
 
 function draw() {
     map.clear();
-    // console.log(ball);
-    // console.log(map.brickList[0]);
     map.checkCollision(ball);
-    map.drawBricks();
-
+    map.drawMap();
     ball.draw();
     ball.x += ball.vx;
     ball.y += ball.vy;
@@ -164,5 +180,9 @@ canvas.addEventListener("mouseover", function (e) {
 canvas.addEventListener("mouseout", function (e) {
     window.cancelAnimationFrame(raf);
 });
-
+canvas.addEventListener('mousemove', function(e) {
+    map.clear();
+    map.racket.move(e.clientX);
+    map.drawMap();
+  });
 ball.draw();
