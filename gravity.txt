@@ -1,0 +1,11 @@
+-ajouter la flèche
+-ajouter la vitesse horizontale
+-ajouter le bounce factor
+-ajouter la classe gravity
+-ajouter le box
+-ajouter le timer et la vitesse en fonction de celui-ci (en pixel par ms).
+
+
+
+//angle of surface
+//angle of approch

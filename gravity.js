@@ -85,7 +85,7 @@ class Arrow {
     }
 
     rotate(angle) {
-        if (angle % 360 <= 90) { 
+        if (angle % 360 <= 90) {
             this.angle = -angle;
         }
     }
@@ -138,38 +138,38 @@ class Gravity {
 
 }
 
+
+
+
 var map = new Map(WIDTH, HEIGHT);
 var ball = new Ball(150, 150, 60);
 map.setBall(ball);
 map.drawBall();
+
 let x = 150;
 let y = 150;
-ball.verticalSpeed = 0;
-ball.horizontalSpeed = 0;
+ball.verticalSpeed = 2;
+ball.horizontalSpeed = 5;
 ball.gravity = 0;
 let gen = 0;
 let g = 1;
 let r = 0;
 let s = 20;
-animate();
 
-let triangle = Math.atan(7/5);
+//animate();
+
+let triangle = Math.atan(7 / 5);
 console.log(radToDeg(triangle));
 
-function radToDeg(rad) {
-    var deg = rad * 180/Math.PI;
-    return deg;
-  }
 
-let arrow = new Arrow(30, HEIGHT-30);
+
+let arrow = new Arrow(30, HEIGHT - 30);
 arrow.rotate(r);
 // arrow.scaleArrow((s / 10), 2);
 arrow.drawArrow();
 
 function angleOnClick(evt) {
-    // console.log(mouseAngle({x: 30, y: HEIGHT-30}, evt));
-    arrow.rotate(mouseAngle({x: 30, y: HEIGHT-30}, evt));
-    // console.log(arrow);
+    arrow.rotate(mouseAngle({ x: 30, y: HEIGHT - 30 }, evt));
 }
 
 async function animate() {
@@ -178,13 +178,6 @@ async function animate() {
         await sleep(MS);
         clearCanvas();
         s += 1;
-        // y += verticalSpeed;
-        // verticalSpeed += g;
-        // x += 20;
-        // if (x > WIDTH) {
-        //     x = WIDTH;
-        // }
-        // console.log(ball);
         if (ball.y + ball.radius >= HEIGHT) {
             // ball.contact = true;
             ball.y = HEIGHT - ball.radius;
@@ -200,15 +193,36 @@ async function animate() {
             ball.contactResistance = 0;
         }
         map.ball.moveBallTime();
-        // arrow.rotate(++r);
-        // arrow.scaleArrow((s/10), 2);
         arrow.drawArrow();
-        // map.moveBall(x, y);
-        // map.drawBall();
         gen++;
     }
 }
 
+function draw() {
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    ball.drawBall();
+    ball.x += ball.horizontalSpeed;
+    ball.y += ball.verticalSpeed;
+    
+    if (ball.y + ball.verticalSpeed > HEIGHT || ball.y + ball.verticalSpeed < 0) {
+        ball.verticalSpeed = -ball.verticalSpeed;
+    }
+    
+    if (ball.x + ball.horizontalSpeed > WIDTH || ball.x + ball.horizontalSpeed < 0) {
+        ball.horizontalSpeed = -ball.horizontalSpeed;
+    }
+    
+    raf = window.requestAnimationFrame(draw);
+}
+
+
+canvas.addEventListener('mouseover', function (e) {
+    raf = window.requestAnimationFrame(draw);
+});
+
+canvas.addEventListener("mouseout", function (e) {
+    window.cancelAnimationFrame(raf);
+});
 
 function bounce() {
 
@@ -217,17 +231,23 @@ function bounce() {
 // let triangle = Math.atan(7/5);
 // console.log(radToDeg(triangle));
 
+
+
+
+
+
+
 function radToDeg(rad) {
-    var deg = rad * 180/Math.PI;
+    var deg = rad * 180 / Math.PI;
     return deg;
-  }
+}
 
 function mouseAngle(base, evt) {
     let angle = 0;
     let w = getMousePos(canvas, evt).x - base.x;
     let h = base.y - getMousePos(canvas, evt).y;
     // console.log(h);
-    let rad = Math.atan(w/h);
+    let rad = Math.atan(w / h);
     angle = 90 - radToDeg(rad);
     return angle;
 }
