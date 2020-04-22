@@ -28,7 +28,7 @@ class Rectangle {
     }
 
     isColliding(rectangle) {
-        if (this.bottom > rectangle.top || this.top < rectangle.bottom || this.left > rectangle.right || this.right < rectangle.left) {
+        if (this.bottom < rectangle.top || this.top > rectangle.bottom || this.left > rectangle.right || this.right < rectangle.left) {
             return false;
         }
         return true;
@@ -68,6 +68,18 @@ class Canvas {
         }
     }
 
+    checkCollision(ball) {
+        for (let i = 0; i < this.brickList.length; i++) {
+            // if (this.brickList[i].isColliding(ball)) {
+                // this.destroyBrick(i);
+            // }
+            if (ball.isColliding(this.brickList[i])) {
+                this.destroyBrick(i);
+            }
+        }
+    
+    }
+
     destroyBrick(index) {
         this.brickList.splice(index, 1);
     }
@@ -78,35 +90,60 @@ class Canvas {
     }
 }
 
-var ball = {
-    x: 100,
-    y: 100,
-    vx: 5,
-    vy: 1,
-    radius: 10,
-    color: 'blue',
-    draw: function () {
+class Ball {
+    constructor() {
+        this.y = 100;
+        this.x = 100;
+        this.vx = 5;
+        this.vy = 1;
+        this.radius = 10;
+        this.color = 'blue';
+        this.edge();
+    }
+
+    edge() {
+        this.top = this.y + this.vy - this.radius;
+        this.bottom = this.y + this.vy + this.radius;
+        this.left = this.x + this.vx - this.radius;
+        this.right = this.x + this.vx + this.radius;
+    }
+
+    draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.fillStyle = this.color;
         ctx.fill();
+        this.edge();
     }
-};
+
+    isColliding(rectangle) {
+        if (this.bottom < rectangle.top || this.top > rectangle.bottom || this.left > rectangle.right || this.right < rectangle.left) {
+            return false;
+        }
+        if (this.bottom == rectangle.top || this.top == rectangle.bottom) {
+            ball.vy = -ball.vy;
+        }
+        if (this.left == rectangle.right || this.right == rectangle.left) {
+            ball.vx = -ball.vx;
+        }
+        return true;
+    }
+}
+
 
 let map = new Canvas();
+let ball = new Ball();
 map.generateBricks(60);
 let ind = 0;
-let d = 0;
 
 function draw() {
     map.clear();
+    // console.log(ball);
+    // console.log(map.brickList[0]);
+    map.checkCollision(ball);
     map.drawBricks();
-    map.destroyBrick(ind);
-    if (++d > 30) {
-        map.generateBricks(90);
-    }
-    console.log(ind);
+
     ball.draw();
     ball.x += ball.vx;
     ball.y += ball.vy;
