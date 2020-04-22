@@ -142,7 +142,7 @@ class Gravity {
 
 
 var map = new Map(WIDTH, HEIGHT);
-var ball = new Ball(150, 150, 60);
+var ball = new Ball(150, 150, 10);
 map.setBall(ball);
 map.drawBall();
 
