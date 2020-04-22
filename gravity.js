@@ -151,7 +151,7 @@ let y = 150;
 ball.verticalSpeed = 2;
 ball.horizontalSpeed = 5;
 ball.gravity = 0.25;
-ball.contactResistance = 0.99;
+ball.contactResistance = 0.75;
 let gen = 0;
 let g = 1;
 let r = 0;
@@ -204,15 +204,28 @@ function draw() {
     ball.drawBall();
     ball.x += ball.horizontalSpeed;
     ball.y += ball.verticalSpeed;
+    ball.verticalSpeed += ball.gravity;
     
     if (ball.y + ball.verticalSpeed + (ball.radius * 0.9) > HEIGHT || ball.y + ball.verticalSpeed - (ball.radius * 0.9) < 0) {
+        ball.verticalSpeed *= ball.contactResistance;
+        ball.horizontalSpeed *= 0.99;
+        if (Math.abs(ball.horizontalSpeed) < 0.2) {
+            ball.horizontalSpeed = 0;
+        }
         ball.verticalSpeed = -ball.verticalSpeed;
+        if (Math.abs(ball.verticalSpeed) < 1) {
+            ball.verticalSpeed = 0;
+        }
     }
     
     if (ball.x + ball.horizontalSpeed + (ball.radius * 0.9) > WIDTH || ball.x + ball.horizontalSpeed - (ball.radius * 0.9) < 0) {
+        ball.horizontalSpeed *= ball.contactResistance;
         ball.horizontalSpeed = -ball.horizontalSpeed;
+        if (Math.abs(ball.horizontalSpeed) < 1) {
+            ball.horizontalSpeed = 0;
+        }
     }
-    
+
     raf = window.requestAnimationFrame(draw);
 }
 
