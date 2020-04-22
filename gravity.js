@@ -150,7 +150,8 @@ let x = 150;
 let y = 150;
 ball.verticalSpeed = 2;
 ball.horizontalSpeed = 5;
-ball.gravity = 0;
+ball.gravity = 0.25;
+ball.contactResistance = 0.99;
 let gen = 0;
 let g = 1;
 let r = 0;
@@ -204,11 +205,11 @@ function draw() {
     ball.x += ball.horizontalSpeed;
     ball.y += ball.verticalSpeed;
     
-    if (ball.y + ball.verticalSpeed > HEIGHT || ball.y + ball.verticalSpeed < 0) {
+    if (ball.y + ball.verticalSpeed + (ball.radius * 0.9) > HEIGHT || ball.y + ball.verticalSpeed - (ball.radius * 0.9) < 0) {
         ball.verticalSpeed = -ball.verticalSpeed;
     }
     
-    if (ball.x + ball.horizontalSpeed > WIDTH || ball.x + ball.horizontalSpeed < 0) {
+    if (ball.x + ball.horizontalSpeed + (ball.radius * 0.9) > WIDTH || ball.x + ball.horizontalSpeed - (ball.radius * 0.9) < 0) {
         ball.horizontalSpeed = -ball.horizontalSpeed;
     }
     
